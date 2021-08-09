@@ -1,8 +1,7 @@
 {
-    "private": "true",
-    "name": "ts-project",
+    "name": "maplibre-gl-temporal-controller",
     "version": "1.0.0",
-    "description": "",
+    "description": "Temporal Controller plugin for Maplibre GL JS",
     "main": "./dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -15,17 +14,20 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Kanahiro/ts-template.git"
+        "url": "git+https://github.com/Kanahiro/maplibre-gl-temporal-controller.git"
     },
     "author": "Kanahiro Iguchi <kanahiro.iguchi@gmail.com> (https://github.com/Kanahiro)",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/Kanahiro/ts-template/issues"
+        "url": "https://github.com/Kanahiro/maplibre-gl-temporal-controller/issues"
     },
-    "homepage": "https://github.com/Kanahiro/ts-template#readme",
-    "dependencies": {},
+    "homepage": "https://github.com/Kanahiro/maplibre-gl-temporal-controller#readme",
+    "dependencies": {
+        "material-icons": "^1.1.1"
+    },
     "devDependencies": {
         "@types/jest": "^26.0.20",
+        "@types/maplibre-gl": "^1.14.0",
         "@types/node": "^14.14.14",
         "jest": "^26.6.3",
         "ts-jest": "^26.5.2",

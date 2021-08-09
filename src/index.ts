@@ -1,4 +1,5 @@
 import { IControl, Map } from 'maplibre-gl';
+import 'material-icons/iconfont/material-icons.css';
 
 const ACTIVE_BUTTON_COLOR = 'rgb(204, 204, 204)';
 
@@ -132,7 +133,7 @@ export default class TemporalControl implements IControl {
     private map: Map | undefined;
     private options: Options;
 
-    private container!: HTMLDivElement;
+    private container: HTMLDivElement;
     private containerTitle!: HTMLDivElement;
     private temporalSlider!: HTMLInputElement;
     private temporalLayers: TemporalLayer[];
@@ -140,20 +141,20 @@ export default class TemporalControl implements IControl {
     constructor(temporalLayers: TemporalLayer[], options: Options = {}) {
         this.temporalLayers = temporalLayers;
         this.options = options;
-    }
-
-    onAdd(map: Map) {
-        this.map = map;
 
         const containerOptions: ContainerOptions = {
             length: this.temporalLayers.length,
             pagingSpeed: this.options.speed || 500,
             onSliderValueChange: () => this.refresh(),
         };
+
         [this.container, this.containerTitle, this.temporalSlider] =
             makeContainer(containerOptions);
+    }
 
-        this.map.getContainer().appendChild(this.container);
+    onAdd(map: Map) {
+        this.map = map;
+        map.getContainer().appendChild(this.container);
 
         this.map.once('load', () => {
             this.refresh();

@@ -144,7 +144,7 @@ export default class TemporalControl implements IControl {
 
         const containerOptions: ContainerOptions = {
             length: this.temporalLayers.length,
-            pagingSpeed: this.options.interval || 500,
+            interval: this.options.interval || 500,
             onSliderValueChange: () => this.refresh(),
         };
 

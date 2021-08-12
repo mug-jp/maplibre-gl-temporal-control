@@ -5,13 +5,13 @@ const ACTIVE_BUTTON_COLOR = 'rgb(204, 204, 204)';
 
 type ContainerOptions = {
     length: number;
-    pagingSpeed: number;
+    interval: number;
     onSliderValueChange: () => void;
 };
 
 const makeContainer = ({
     length,
-    pagingSpeed,
+    interval,
     onSliderValueChange,
 }: ContainerOptions): [HTMLDivElement, HTMLDivElement, HTMLInputElement] => {
     // outest div
@@ -96,7 +96,7 @@ const makeContainer = ({
         playButton.style.backgroundColor = ACTIVE_BUTTON_COLOR;
         const timerId = setInterval(() => {
             increment();
-        }, pagingSpeed);
+        }, interval);
         pauseButton.onclick = () => {
             clearInterval(timerId);
             pauseButton.onclick = null;
@@ -127,7 +127,7 @@ type TemporalLayer = {
 
 type Options = {
     position?: Position;
-    speed?: number;
+    interval?: number;
 };
 export default class TemporalControl implements IControl {
     private map: Map | undefined;
@@ -144,7 +144,7 @@ export default class TemporalControl implements IControl {
 
         const containerOptions: ContainerOptions = {
             length: this.temporalLayers.length,
-            pagingSpeed: this.options.speed || 500,
+            pagingSpeed: this.options.interval || 500,
             onSliderValueChange: () => this.refresh(),
         };
 

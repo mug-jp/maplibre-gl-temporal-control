@@ -25,7 +25,6 @@ import TemporalControl from 'maplibre-gl-temporal-control';
 
 const temporalFrames = [
     {
-        {
         title:'frame1', // shown on control panel
         layers:[anyLayer1_1, anyLayer1_2...] // set layers you want to show at one frame
     },

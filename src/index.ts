@@ -1,5 +1,6 @@
-import { IControl, Map } from 'maplibre-gl';
-import 'material-icons/iconfont/material-icons.css';
+import { AnyLayer, IControl, Map } from 'maplibre-gl';
+
+import { play, pause, reload, skipBackward, skipForward } from './icons';
 
 const ACTIVE_BUTTON_COLOR = 'rgb(204, 204, 204)';
 
@@ -7,6 +8,12 @@ type ContainerOptions = {
     length: number;
     interval: number;
     onSliderValueChange: () => void;
+};
+
+const makeImg = (icon: string): HTMLImageElement => {
+    const img = document.createElement('img');
+    img.src = icon;
+    return img;
 };
 
 const makeContainer = ({
@@ -48,7 +55,7 @@ const makeContainer = ({
     buttonsDiv.style.justifyContent = 'center';
     buttonsDiv.style.margin = '4px 0 0 0';
     const loopButton = document.createElement('button');
-    loopButton.innerHTML = '<span class="material-icons">loop</span>';
+    loopButton.appendChild(makeImg(reload));
     loopButton.style.border = '0';
     loopButton.style.borderRadius = '0';
     loopButton.style.marginRight = '16px';
@@ -78,16 +85,16 @@ const makeContainer = ({
         return Number(slider.value) < Number(slider.max);
     };
     const prevButton = document.createElement('button');
-    prevButton.innerHTML = '<span class="material-icons">skip_previous</span>';
+    prevButton.appendChild(makeImg(skipBackward));
     prevButton.onclick = decrement;
     prevButton.style.border = '0';
     prevButton.style.height = '24px';
     const pauseButton = document.createElement('button');
-    pauseButton.innerHTML = '<span class="material-icons">pause</span>';
+    pauseButton.appendChild(makeImg(pause));
     pauseButton.style.border = '0';
     pauseButton.style.height = '24px';
     const playButton = document.createElement('button');
-    playButton.innerHTML = '<span class="material-icons">play_arrow</span>';
+    playButton.appendChild(makeImg(play));
     playButton.style.border = '0';
     playButton.style.height = '24px';
     playButton.onclick = () => {
@@ -104,7 +111,7 @@ const makeContainer = ({
         };
     };
     const nextButton = document.createElement('button');
-    nextButton.innerHTML = '<span class="material-icons">skip_next</span>';
+    nextButton.appendChild(makeImg(skipForward));
     nextButton.style.border = '0';
     nextButton.style.height = '24px';
     nextButton.onclick = increment;
@@ -120,15 +127,16 @@ const makeContainer = ({
 
 type Position = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
-type TemporalLayer = {
-    id: string;
-    title?: string;
+type TemporalFrame = {
+    title: string;
+    layers: AnyLayer[];
 };
 
 type Options = {
     position?: Position;
     interval?: number;
 };
+
 export default class TemporalControl implements IControl {
     private map: Map | undefined;
     private options: Options;
@@ -136,14 +144,14 @@ export default class TemporalControl implements IControl {
     private container: HTMLDivElement;
     private containerTitle!: HTMLDivElement;
     private temporalSlider!: HTMLInputElement;
-    private temporalLayers: TemporalLayer[];
+    private temporalFrames: TemporalFrame[];
 
-    constructor(temporalLayers: TemporalLayer[], options: Options = {}) {
-        this.temporalLayers = temporalLayers;
+    constructor(temporalFrames: TemporalFrame[], options: Options = {}) {
+        this.temporalFrames = temporalFrames;
         this.options = options;
 
         const containerOptions: ContainerOptions = {
-            length: this.temporalLayers.length,
+            length: this.temporalFrames.length,
             interval: this.options.interval || 500,
             onSliderValueChange: () => this.refresh(),
         };
@@ -156,9 +164,10 @@ export default class TemporalControl implements IControl {
         this.map = map;
         map.getContainer().appendChild(this.container);
 
-        this.map.once('load', () => {
+        this.map.once('styledata', () => {
             this.refresh();
         });
+
         return this.container;
     }
 
@@ -172,12 +181,36 @@ export default class TemporalControl implements IControl {
     }
 
     refresh() {
-        this.temporalLayers.forEach((layer) => {
-            this.map?.setFilter(layer.id, false);
+        this.temporalFrames.forEach((temporalFrame) => {
+            temporalFrame.layers.forEach((layer) =>
+                this.setVisible(layer, false),
+            );
         });
         const sliderValue = Number(this.temporalSlider.value);
-        const { id, title } = this.temporalLayers[sliderValue];
-        this.containerTitle.innerHTML = title || id;
-        this.map?.setFilter(id, true);
+        this.containerTitle.innerHTML = this.temporalFrames[sliderValue].title;
+        const { layers } = this.temporalFrames[sliderValue];
+        layers.forEach((layer) => this.setVisible(layer));
+    }
+
+    private setVisible(layer: AnyLayer, isVisible = true) {
+        if (layer.type === 'raster') {
+            // when raster, set opacity as visibility for background loading
+            this.map?.setPaintProperty(layer.id, 'raster-opacity-transition', {
+                // set disable fade-in transition
+                duration: 0,
+            });
+            this.map?.setPaintProperty(
+                layer.id,
+                'raster-opacity',
+                isVisible ? layer.paint?.['raster-opacity'] || 1 : 0,
+            );
+        } else {
+            // vector
+            this.map?.setLayoutProperty(
+                layer.id,
+                'visibility',
+                isVisible ? 'visible' : 'none',
+            );
+        }
     }
 }

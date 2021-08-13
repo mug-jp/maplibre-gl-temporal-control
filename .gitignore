@@ -1,2 +1,4 @@
 node_modules/
 dist/
+example/bundle.js
+example/bundle.js.LICENSE.txt

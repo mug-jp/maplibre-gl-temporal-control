@@ -45,7 +45,7 @@ nowcast.getTimeData().then((timedata) => {
     const overlayLayers = mapStyle.layers.slice(1); //layers[0] = background
     const temporalFrames = overlayLayers.map((layer) => ({
         layers: [layer],
-        title: formatDatetimeText(layer.id.substring(46, 60)),
+        title: formatDatetimeText(layer.id.substring(66, 80)),
     }));
 
     const temporalControl = new TemporalControl(temporalFrames, {

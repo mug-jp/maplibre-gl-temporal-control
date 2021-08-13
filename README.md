@@ -1,5 +1,7 @@
 # maplibre-gl-temporal-control
 
+example: https://kanahiro.github.io/maplibre-gl-temporal-control/
+
 <img src='./imgs/anime.gif'>
 
 ## usage

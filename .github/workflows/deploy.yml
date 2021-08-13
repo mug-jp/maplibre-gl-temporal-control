@@ -1,0 +1,44 @@
+name: github pages
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build-deploy:
+    # ubuntu OS を仮想マシン上に用意する
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+
+    # Node.js環境のセットアップを行う
+    - name: setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+
+    # npm install の際にキャッシュを使うよう設定
+    - name: Cache dependencies
+      uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    # package.jsonに基づき依存パッケージをインストールする
+    - name: install
+      run: npm install --frozen-lockfile
+
+    - name: build
+      run: npm run build
+
+    - name: add nojekyll
+      run: touch ./out/.nojekyll
+
+    - name: deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./example

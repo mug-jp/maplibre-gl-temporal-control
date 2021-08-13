@@ -1,0 +1,36 @@
+# maplibre-gl-temporal-control
+
+<img src='./imgs/anime.gif'>
+
+## usage
+
+```sh
+npm install maplibre-gl-temporal-control
+```
+
+```typescript
+
+import TemporalControl from 'maplibre-gl-temporal-control';
+
+const temporalFrames = [
+    {
+        {
+        title:'frame1', // shown on control panel
+        layers:[anyLayer1_1, anyLayer1_2...] // set layers you want to show at one frame
+    },
+        title:'frame2',
+        layers:[anyLayer2_1, anyLayer2_2...]
+    },
+    {
+        title:'frame3',
+        layers:[anyLayer3_1, anyLayer3_2...]
+    },
+    // add frames...
+]
+
+const temporalControl = new TemporalControl(temporalFrames, {
+    interval: 100, // a duration frames are shown
+    position: 'top-left'
+});
+map.addControl(temporalControl);
+```

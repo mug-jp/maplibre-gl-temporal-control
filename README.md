@@ -10,6 +10,17 @@ npm install maplibre-gl-temporal-control
 
 ```typescript
 
+const map = new maplibregl.Map({})
+
+// anyLayer is maplibre layer-object
+map.addLayer(anyLayer1_1)
+map.addLayer(anyLayer1_2)
+map.addLayer(anyLayer2_1)
+map.addLayer(anyLayer2_2)
+map.addLayer(anyLayer3_1)
+map.addLayer(anyLayer3_2)
+// some layers...
+
 import TemporalControl from 'maplibre-gl-temporal-control';
 
 const temporalFrames = [
@@ -34,3 +45,8 @@ const temporalControl = new TemporalControl(temporalFrames, {
 });
 map.addControl(temporalControl);
 ```
+
+### Tips
+
+-   In frames, You must set layer-objects corresponding to in map.
+-   Layers set in frames must be added in map

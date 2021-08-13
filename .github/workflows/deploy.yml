@@ -35,7 +35,7 @@ jobs:
       run: npm run build
 
     - name: add nojekyll
-      run: touch ./out/.nojekyll
+      run: touch ./example/.nojekyll
 
     - name: deploy
       uses: peaceiris/actions-gh-pages@v3

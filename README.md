@@ -12,7 +12,7 @@ npm install maplibre-gl-temporal-control
 
 ```typescript
 
-const map = new maplibregl.Map({})
+const map = new maplibregl.Map(mapOptions)
 
 // anyLayer is maplibre layer-object
 map.addLayer(anyLayer1_1)

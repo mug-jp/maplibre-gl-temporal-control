@@ -3,74 +3,126 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 import TemporalControl from '../src';
 
-import { nowcast } from 'jma-utils';
+const temporalLayerNames = [
+    '201901',
+    '201902',
+    '201903',
+    '201904',
+    '201905',
+    '201906',
+    '201907',
+    '201908',
+    '201909',
+    '201910',
+    '201911',
+    '201912',
+    '202001',
+    '202002',
+    '202003',
+    '202004',
+    '202005',
+    '202006',
+    '202007',
+    '202008',
+    '202009',
+    '202010',
+    '202011',
+    '202012',
+];
 
-const makeMapStyle = (xyzUrls) => {
-    const xyzSourcesLayers = xyzUrls.map((xyzUrl) =>
-        makeXyzTileSourceLayer(xyzUrl),
-    );
-    const xyzSources = xyzSourcesLayers.reduce((prev, sourceLayer) => {
-        return {
-            ...prev,
-            ...sourceLayer.source,
-        };
-    }, {});
-    const xyzLayers = xyzSourcesLayers.map((sourceLayer) => sourceLayer.layer);
+const getPaint = (layerName) => {
+    const targetData = layerName + 'd1t0';
     return {
-        version: 8,
-        sources: {
-            OSM: {
-                type: 'raster',
-                tiles: [
-                    'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-                ],
-                tileSize: 256,
-                attribution:
-                    '<a href="https://maps.gsi.go.jp/development/ichiran.html">地理院タイル</a>',
-            },
-            ...xyzSources,
-        },
-        layers: [
-            {
-                id: 'OSM',
-                type: 'raster',
-                source: 'OSM',
-                minzoom: 0,
-                maxzoom: 18,
-            },
-            ...xyzLayers,
+        'fill-color': [
+            'interpolate',
+            ['linear'],
+            ['get', targetData],
+            0,
+            '#ffffff',
+            100,
+            '#0000ff',
+            5000,
+            '#00ff00',
+            10000,
+            '#ffff00',
+            30000,
+            '#ff0000',
+            100000,
+            '#990000',
+        ],
+        'fill-opacity': [
+            'interpolate',
+            ['linear'],
+            ['get', targetData],
+            0,
+            0,
+            100,
+            0.1,
+            5000,
+            0.2,
+            10000,
+            0.3,
+            30000,
+            0.4,
+            100000,
+            0.4,
         ],
     };
 };
 
-const makeXyzTileSourceLayer = (xyzUrl) => {
-    const source = {
-        [xyzUrl]: { type: 'raster', tiles: [xyzUrl], minzoom: 4, maxzoom: 10 },
+const temporalLayers = temporalLayerNames.map((layerName) => {
+    return {
+        id: layerName,
+        type: 'fill',
+        source: 'mesh',
+        'source-layer': 'meshesgeojsonl',
+        paint: getPaint(layerName),
+        minzoom: 10,
     };
-    const layer = {
-        id: xyzUrl,
-        type: 'raster',
-        source: xyzUrl,
-        paint: {
-            'raster-opacity': 0.5,
+});
+
+const mapStyle = {
+    version: 8,
+    sources: {
+        OSM: {
+            type: 'raster',
+            tiles: [
+                'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+            ],
+            tileSize: 256,
+            attribution:
+                '<a href="https://maps.gsi.go.jp/development/ichiran.html">地理院タイル</a>',
         },
-    };
-    return { source, layer };
+        mesh: {
+            type: 'vector',
+            tiles: [
+                'https://kanahiro.github.io/temporal-pop-mesh/meshes/{z}/{x}/{y}.pbf',
+            ],
+            minzoom: 9,
+            maxzoom: 9,
+        },
+    },
+    layers: [
+        {
+            id: 'gsi',
+            type: 'raster',
+            source: 'OSM',
+            minzoom: 0,
+            maxzoom: 17,
+        },
+        ...temporalLayers,
+    ],
 };
 
 const map = new maplibregl.Map({
     container: 'map',
-    style: {
-        version: 8,
-        sources: {},
-        layers: [],
-    },
-    center: [136.0, 35.0],
-    zoom: 4,
+    style: mapStyle,
+    center: [139.7, 35.7],
+    zoom: 10,
     minZoom: 4,
     maxZoom: 12,
     customAttribution:
-        "<a href='https://www.jma.go.jp/jma/indexe.html' target='_blank'>Japan Meteorological Agency</a> | <a href='https://twitter.com/kanahiro_iguchi' target='_blank'>@kanahiro_iguchi</a>",
+        "<a href='https://www.geospatial.jp/ckan/dataset/mlit-1km-fromto' target='_blank'>全国の人流オープンデータ(平日昼間人口)</a> | <a href='https://twitter.com/kanahiro_iguchi' target='_blank'>@kanahiro_iguchi</a>",
 });
 
 const formatDatetimeText = (yyyymmddHHMMSS) => {
@@ -84,24 +136,13 @@ const formatDatetimeText = (yyyymmddHHMMSS) => {
     return `${yyyy}-${mm}-${dd}T${HH}:${MM}:${SS}Z`;
 };
 
-nowcast.getTimeData().then((timedata) => {
-    const tileUrlData = nowcast.getXyzTileUrlData(timedata);
-    const tileUrls = [
-        ...tileUrlData.past,
-        tileUrlData.now,
-        ...tileUrlData.forecast,
-    ];
-    const mapStyle = makeMapStyle(tileUrls);
-    map.setStyle(mapStyle);
+const temporalFrames = temporalLayers.map((layer) => ({
+    layers: [layer],
+    title: layer.id,
+}));
 
-    const overlayLayers = mapStyle.layers.slice(1); //layers[0] = background
-    const temporalFrames = overlayLayers.map((layer) => ({
-        layers: [layer],
-        title: formatDatetimeText(layer.id.substring(66, 80)),
-    }));
-
-    const temporalControl = new TemporalControl(temporalFrames, {
-        interval: 100,
-    });
-    map.addControl(temporalControl);
+const temporalControl = new TemporalControl(temporalFrames, {
+    interval: 500,
+    performance: true,
 });
+map.addControl(temporalControl);

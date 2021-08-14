@@ -135,6 +135,7 @@ type TemporalFrame = {
 type Options = {
     position?: Position;
     interval?: number;
+    performance?: boolean;
 };
 
 export default class TemporalControl implements IControl {
@@ -181,31 +182,52 @@ export default class TemporalControl implements IControl {
     }
 
     refresh() {
-        this.temporalFrames.forEach((temporalFrame) => {
-            temporalFrame.layers.forEach((layer) =>
-                this.setVisible(layer, false),
-            );
-        });
         const sliderValue = Number(this.temporalSlider.value);
         this.containerTitle.innerHTML = this.temporalFrames[sliderValue].title;
-        const { layers } = this.temporalFrames[sliderValue];
-        layers.forEach((layer) => this.setVisible(layer));
+        const visibleLayerIds = this.temporalFrames[sliderValue].layers.map(
+            (layer) => layer.id,
+        );
+        this.temporalFrames.forEach((temporalFrame) => {
+            temporalFrame.layers.forEach((layer) =>
+                this.setVisible(layer, visibleLayerIds.includes(layer.id)),
+            );
+        });
     }
 
     private setVisible(layer: AnyLayer, isVisible = true) {
-        if (layer.type === 'raster') {
-            // when raster, set opacity as visibility for background loading
-            this.map?.setPaintProperty(layer.id, 'raster-opacity-transition', {
-                // set disable fade-in transition
-                duration: 0,
-            });
+        if (
+            layer.type === 'raster' ||
+            layer.type === 'fill' ||
+            layer.type === 'circle' ||
+            layer.type === 'line'
+        ) {
+            if (layer.type === 'raster') {
+                // when raster, set opacity as visibility for background loading
+                this.map?.setPaintProperty(
+                    layer.id,
+                    `${layer.type}-opacity-transition`,
+                    {
+                        // set disable fade-in transition
+                        duration: 0,
+                    },
+                );
+            }
+            let opacity;
+            if (isVisible) {
+                // @ts-ignore
+                opacity = layer.paint?.[`${layer.type}-opacity`] || 1;
+            } else {
+                opacity = this.options.performance
+                    ? 0.000000000000000000001
+                    : 0;
+            }
+
             this.map?.setPaintProperty(
                 layer.id,
-                'raster-opacity',
-                isVisible ? layer.paint?.['raster-opacity'] || 1 : 0,
+                `${layer.type}-opacity`,
+                opacity,
             );
         } else {
-            // vector
             this.map?.setLayoutProperty(
                 layer.id,
                 'visibility',

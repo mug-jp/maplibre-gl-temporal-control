@@ -1,5 +1,7 @@
 .DS_Store
 node_modules/
 dist/
-example/bundle.js
-example/bundle.js.LICENSE.txt
+example/raster.bundle.js
+example/raster.bundle.js.LICENSE.txt
+example/vectortile.bundle.js
+example/vectortile.bundle.js.LICENSE.txt

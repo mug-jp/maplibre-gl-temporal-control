@@ -3,14 +3,17 @@ const path = require('path');
 
 module.exports = {
     mode: 'development',
-    entry: './example/index.js',
+    entry: {
+        vectortile: './example/vectortile.js',
+        raster: './example/raster.js',
+    },
     plugins: [
         new webpack.ProvidePlugin({
             Promise: 'es6-promise',
         }),
     ],
     output: {
-        filename: 'bundle.js',
+        filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'example'),
     },
     module: {

@@ -3,5 +3,5 @@ node_modules/
 dist/
 example/raster.bundle.js
 example/raster.bundle.js.LICENSE.txt
-example/vectortile.bundle.js
-example/vectortile.bundle.js.LICENSE.txt
+example/vector.bundle.js
+example/vector.bundle.js.LICENSE.txt

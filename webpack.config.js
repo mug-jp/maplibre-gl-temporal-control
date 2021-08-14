@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = {
     mode: 'development',
     entry: {
-        vectortile: './example/vectortile.js',
+        vector: './example/vector.js',
         raster: './example/raster.js',
     },
     plugins: [

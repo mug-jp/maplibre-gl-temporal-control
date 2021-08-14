@@ -4,8 +4,8 @@
 
 ## examples
 
-RasterTiles: https://kanahiro.github.io/maplibre-gl-temporal-control/raster.html
-VectorTiles: https://kanahiro.github.io/maplibre-gl-temporal-control/vectortile.html
+-   RasterTiles: https://kanahiro.github.io/maplibre-gl-temporal-control/raster.html
+-   VectorTiles: https://kanahiro.github.io/maplibre-gl-temporal-control/vectortile.html
 
 ## usage
 

@@ -117,7 +117,7 @@ const map = new maplibregl.Map({
     container: 'map',
     style: mapStyle,
     center: [139.7, 35.7],
-    zoom: 9,
+    zoom: 10,
     minZoom: 4,
     maxZoom: 12,
     customAttribution:
@@ -141,7 +141,7 @@ const temporalFrames = temporalLayers.map((layer) => ({
 }));
 
 const temporalControl = new TemporalControl(temporalFrames, {
-    interval: 500,
+    interval: 1000,
     performance: true,
 });
 map.addControl(temporalControl);

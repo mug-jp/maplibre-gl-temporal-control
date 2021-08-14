@@ -45,7 +45,8 @@ const temporalFrames = [
 
 const temporalControl = new TemporalControl(temporalFrames, {
     interval: 100, // a duration frames are shown
-    position: 'top-left'
+    position: 'top-left',
+    performance: true // set when rendering is too slow, but frames which are not current are shown mostly transparent
 });
 map.addControl(temporalControl);
 ```
@@ -54,3 +55,5 @@ map.addControl(temporalControl);
 
 -   In frames, You must set layer-objects corresponding to in map.
 -   Layers set in frames must be added in map
+-   when `performance: true`, not-current frames are shown as opacity=0.000000000000000000001
+    -   this option shoud'nt be neccesary for ordinary usecases

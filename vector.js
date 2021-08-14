@@ -77,7 +77,6 @@ const temporalLayers = temporalLayerNames.map((layerName) => {
         source: 'mesh',
         'source-layer': 'meshesgeojsonl',
         paint: getPaint(layerName),
-        minzoom: 10,
     };
 });
 
@@ -118,7 +117,7 @@ const map = new maplibregl.Map({
     container: 'map',
     style: mapStyle,
     center: [139.7, 35.7],
-    zoom: 10,
+    zoom: 9,
     minZoom: 4,
     maxZoom: 12,
     customAttribution:

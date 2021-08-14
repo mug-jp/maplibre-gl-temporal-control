@@ -9,7 +9,8 @@
     ],
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "tsc && webpack --mode production --config webpack.config.js",
+        "build": "tsc && npm run webpack:build",
+        "webpack:build": "webpack --mode production --config webpack.config.js",
         "prepare": "tsc",
         "dev": "webpack serve --mode development --open --hot --inline --config webpack.config.js"
     },

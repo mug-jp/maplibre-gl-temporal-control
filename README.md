@@ -56,4 +56,4 @@ map.addControl(temporalControl);
 -   In frames, You must set layer-objects corresponding to in map.
 -   Layers set in frames must be added in map
 -   when `performance: true`, not-current frames are shown as opacity=0.000000000000000000001
-    -   this option shoud'nt be neccesary for ordinary usecases
+    -   this option may not be neccesary for ordinary usecases

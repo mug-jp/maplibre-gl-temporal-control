@@ -47,6 +47,7 @@ const temporalControl = new TemporalControl(temporalFrames, {
     interval: 100, // duration a frame is shown, in miliseconds
     position: 'top-left',
     performance: true // set when rendering is too slow, but frames which are not current are shown mostly transparent
+    showButtons: true // show buttons to change frames
 });
 map.addControl(temporalControl);
 ```

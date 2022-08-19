@@ -1,53 +1,55 @@
-import { AnyLayer, IControl, Map } from 'maplibre-gl';
+import {LayerSpecification, IControl, Map, ControlPosition} from 'maplibre-gl';
 
-import { play, pause, reload, skipBackward, skipForward } from './icons';
+import {play, pause, reload, skipBackward, skipForward} from './icons';
 
 const ACTIVE_BUTTON_COLOR = 'rgb(204, 204, 204)';
 
 type ContainerOptions = {
-    length: number;
-    interval: number;
-    onSliderValueChange: () => void;
+  length: number;
+  interval: number;
+  showButtons?: boolean;
+  onSliderValueChange: () => void;
 };
 
 const makeImg = (icon: string): HTMLImageElement => {
-    const img = document.createElement('img');
-    img.src = icon;
-    return img;
+  const img = document.createElement('img');
+  img.src = icon;
+  return img;
 };
 
 const makeContainer = ({
-    length,
-    interval,
-    onSliderValueChange,
-}: ContainerOptions): [HTMLDivElement, HTMLDivElement, HTMLInputElement] => {
-    // outest div
-    const container = document.createElement('div');
-    container.classList.add('mapboxgl-ctrl');
-    container.classList.add('mapboxgl-ctrl-group');
-    container.style.width = '240px';
-    container.style.height = '84px';
-    container.style.backgroundColor = '#fff';
-    container.style.textAlign = 'center';
+                         length,
+                         interval,
+                         showButtons,
+                         onSliderValueChange,
+                       }: ContainerOptions): [HTMLDivElement, HTMLDivElement, HTMLInputElement] => {
+  // outest div
+  const container = document.createElement('div');
+  container.classList.add('mapboxgl-ctrl');
+  container.classList.add('mapboxgl-ctrl-group');
+  container.style.width = '240px';
+  container.style.height = showButtons ? '84px' : '56px';
+  container.style.backgroundColor = '#fff';
+  container.style.textAlign = 'center';
 
-    const titleDiv = document.createElement('div');
-    titleDiv.innerHTML = '<br />';
-    titleDiv.style.marginTop = '4px';
-    container.appendChild(titleDiv);
+  const titleDiv = document.createElement('div');
+  titleDiv.innerHTML = '<br />';
+  titleDiv.style.marginTop = '4px';
+  container.appendChild(titleDiv);
 
-    // temporal slider
-    const slider = document.createElement('input');
-    slider.type = 'range';
-    slider.value = '0';
-    slider.min = '0';
-    slider.max = String(length - 1);
-    slider.addEventListener('input', () => {
-        onSliderValueChange();
-    });
-    slider.style.width = '80%';
-    slider.style.margin = '4px 0';
-    container.appendChild(slider);
-
+  // temporal slider
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.value = '0';
+  slider.min = '0';
+  slider.max = String(length - 1);
+  slider.addEventListener('input', () => {
+    onSliderValueChange();
+  });
+  slider.style.width = '80%';
+  slider.style.margin = '4px 0';
+  container.appendChild(slider);
+  if (showButtons) {
     // buttons div
     // loop, prev, pause, play, next
     const buttonsDiv = document.createElement('div');
@@ -61,28 +63,29 @@ const makeContainer = ({
     loopButton.style.marginRight = '16px';
     loopButton.style.height = '24px';
     loopButton.onclick = () => {
-        loopButton.style.backgroundColor =
-            loopButton.style.backgroundColor === '' ? ACTIVE_BUTTON_COLOR : '';
+      loopButton.style.backgroundColor =
+        loopButton.style.backgroundColor === '' ? ACTIVE_BUTTON_COLOR : '';
     };
     buttonsDiv.appendChild(loopButton);
     const decrement = () => {
-        slider.value = String(Math.max(0, Number(slider.value) - 1));
-        onSliderValueChange();
-        return Number(slider.min) < Number(slider.value);
+      slider.value = String(Math.max(0, Number(slider.value) - 1));
+      onSliderValueChange();
+      return Number(slider.min) < Number(slider.value);
     };
     const increment = () => {
-        if (
-            loopButton.style.backgroundColor !== '' &&
-            Number(slider.value) == Number(slider.max)
-        ) {
-            while (decrement()) {}
-        } else {
-            slider.value = String(
-                Math.min(Number(slider.max), Number(slider.value) + 1),
-            );
+      if (
+        loopButton.style.backgroundColor !== '' &&
+        Number(slider.value) == Number(slider.max)
+      ) {
+        while (decrement()) {
         }
-        onSliderValueChange();
-        return Number(slider.value) < Number(slider.max);
+      } else {
+        slider.value = String(
+          Math.min(Number(slider.max), Number(slider.value) + 1),
+        );
+      }
+      onSliderValueChange();
+      return Number(slider.value) < Number(slider.max);
     };
     const prevButton = document.createElement('button');
     prevButton.appendChild(makeImg(skipBackward));
@@ -98,17 +101,17 @@ const makeContainer = ({
     playButton.style.border = '0';
     playButton.style.height = '24px';
     playButton.onclick = () => {
-        if (playButton.style.backgroundColor === ACTIVE_BUTTON_COLOR) return;
+      if (playButton.style.backgroundColor === ACTIVE_BUTTON_COLOR) return;
 
-        playButton.style.backgroundColor = ACTIVE_BUTTON_COLOR;
-        const timerId = setInterval(() => {
-            increment();
-        }, interval);
-        pauseButton.onclick = () => {
-            clearInterval(timerId);
-            pauseButton.onclick = null;
-            playButton.style.backgroundColor = '';
-        };
+      playButton.style.backgroundColor = ACTIVE_BUTTON_COLOR;
+      const timerId = setInterval(() => {
+        increment();
+      }, interval);
+      pauseButton.onclick = () => {
+        clearInterval(timerId);
+        pauseButton.onclick = null;
+        playButton.style.backgroundColor = '';
+      };
     };
     const nextButton = document.createElement('button');
     nextButton.appendChild(makeImg(skipForward));
@@ -121,118 +124,123 @@ const makeContainer = ({
     buttonsDiv.appendChild(nextButton);
 
     container.appendChild(buttonsDiv);
-
-    return [container, titleDiv, slider];
+  }
+  return [container, titleDiv, slider];
 };
 
-type Position = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 type TemporalFrame = {
-    title: string;
-    layers: AnyLayer[];
+  title: string;
+  layers: LayerSpecification[];
 };
 
 type Options = {
-    position?: Position;
-    interval?: number;
-    performance?: boolean;
+  position?: ControlPosition;
+  interval?: number;
+  performance?: boolean;
+  showButtons?: boolean;
 };
 
 export default class TemporalControl implements IControl {
-    private map: Map | undefined;
-    private options: Options;
+  private map: Map | undefined;
+  private options: Options;
 
-    private container: HTMLDivElement;
-    private containerTitle!: HTMLDivElement;
-    private temporalSlider!: HTMLInputElement;
-    private temporalFrames: TemporalFrame[];
+  private container: HTMLDivElement;
+  private containerTitle!: HTMLDivElement;
+  private temporalSlider!: HTMLInputElement;
+  private temporalFrames: TemporalFrame[];
 
-    constructor(temporalFrames: TemporalFrame[], options: Options = {}) {
-        this.temporalFrames = temporalFrames;
-        this.options = options;
+  constructor(temporalFrames: TemporalFrame[], options: Options = {}) {
+    this.temporalFrames = temporalFrames;
+    this.options = options;
 
-        const containerOptions: ContainerOptions = {
-            length: this.temporalFrames.length,
-            interval: this.options.interval || 500,
-            onSliderValueChange: () => this.refresh(),
-        };
+    const containerOptions: ContainerOptions = {
+      length: this.temporalFrames.length,
+      interval: this.options.interval || 500,
+      showButtons: this.options.showButtons || false,
+      onSliderValueChange: () => this.refresh(),
+    };
 
-        [this.container, this.containerTitle, this.temporalSlider] =
-            makeContainer(containerOptions);
-    }
+    [this.container, this.containerTitle, this.temporalSlider] =
+      makeContainer(containerOptions);
+  }
 
-    onAdd(map: Map) {
-        this.map = map;
-        map.getContainer().appendChild(this.container);
+  onAdd(map: Map) {
+    this.map = map;
+    map.getContainer().appendChild(this.container);
 
-        this.map.once('styledata', () => {
-            this.refresh();
-        });
+    this.map.on('styledata', () => {
+      this.refresh();
+    });
 
-        return this.container;
-    }
+    return this.container;
+  }
 
-    onRemove() {
-        this.container.parentNode?.removeChild(this.container);
-        this.map = undefined;
-    }
+  onRemove() {
+    this.container.parentNode?.removeChild(this.container);
+    this.map = undefined;
+  }
 
-    getDefaultPosition(): string {
-        return 'bottom-left';
-    }
+  getDefaultPosition(): ControlPosition {
+    return 'bottom-left';
+  }
 
-    refresh() {
-        const sliderValue = Number(this.temporalSlider.value);
-        this.containerTitle.innerHTML = this.temporalFrames[sliderValue].title;
-        const visibleLayerIds = this.temporalFrames[sliderValue].layers.map(
-            (layer) => layer.id,
+  refresh() {
+    if (this.map?.style && this.map.style?._loaded) {
+      const sliderValue = Number(this.temporalSlider.value);
+      this.containerTitle.innerHTML = this.temporalFrames[sliderValue].title;
+      const visibleLayerIds = this.temporalFrames[sliderValue].layers.map(
+        (layer) => layer.id,
+      );
+      this.temporalFrames.forEach((temporalFrame) => {
+        temporalFrame.layers.forEach((layer) =>
+          this.setVisible(layer, visibleLayerIds.includes(layer.id)),
         );
-        this.temporalFrames.forEach((temporalFrame) => {
-            temporalFrame.layers.forEach((layer) =>
-                this.setVisible(layer, visibleLayerIds.includes(layer.id)),
-            );
-        });
+      });
     }
+  }
 
-    private setVisible(layer: AnyLayer, isVisible = true) {
-        if (
-            layer.type === 'raster' ||
-            layer.type === 'fill' ||
-            layer.type === 'circle' ||
-            layer.type === 'line'
-        ) {
-            if (layer.type === 'raster') {
-                // when raster, set opacity as visibility for background loading
-                this.map?.setPaintProperty(
-                    layer.id,
-                    `${layer.type}-opacity-transition`,
-                    {
-                        // set disable fade-in transition
-                        duration: 0,
-                    },
-                );
-            }
-            let opacity;
-            if (isVisible) {
-                // @ts-ignore
-                opacity = layer.paint?.[`${layer.type}-opacity`] || 1;
-            } else {
-                opacity = this.options.performance
-                    ? 0.000000000000000000001
-                    : 0;
-            }
-
-            this.map?.setPaintProperty(
-                layer.id,
-                `${layer.type}-opacity`,
-                opacity,
-            );
-        } else {
-            this.map?.setLayoutProperty(
-                layer.id,
-                'visibility',
-                isVisible ? 'visible' : 'none',
-            );
+  private setVisible(layer: LayerSpecification, isVisible = true) {
+    if (this.map?.getLayer(layer.id)) {
+      if (
+        layer.type === 'raster' ||
+        layer.type === 'fill' ||
+        layer.type === 'circle' ||
+        layer.type === 'line'
+      ) {
+        if (layer.type === 'raster') {
+          // when raster, set opacity as visibility for background loading
+          this.map?.setPaintProperty(
+            layer.id,
+            `${layer.type}-opacity-transition`,
+            {
+              // set disable fade-in transition
+              duration: 0,
+            },
+          );
         }
+        let opacity;
+        if (isVisible) {
+          // @ts-ignore
+          opacity = layer.paint?.[`${layer.type}-opacity`] || 1;
+        } else {
+          opacity = this.options.performance
+            ? 0.000000000000000000001
+            : 0;
+        }
+
+        this.map?.setPaintProperty(
+          layer.id,
+          `${layer.type}-opacity`,
+          opacity,
+        );
+      } else {
+        this.map?.setLayoutProperty(
+          layer.id,
+          'visibility',
+          isVisible ? 'visible' : 'none',
+        );
+      }
     }
+  }
 }

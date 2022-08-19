@@ -15,39 +15,59 @@ npm install maplibre-gl-temporal-control
 
 ```typescript
 
+const layers = [
+    {
+    id: 'layer-1',
+    type: 'raster',
+    source: 'raster-source-1',
+    // ...
+    },
+    {
+    id: 'layer-2',
+    type: 'raster',
+    source: 'raster-source-2',
+    // ...
+    },
+    {
+    id: 'layer-3',
+    type: 'vector',
+    source: 'vector-source-1',
+    // ...
+    }
+    // ...
+];
+
 const map = new maplibregl.Map(mapOptions)
 
-// anyLayer is maplibre layer-object
-map.addLayer(anyLayer1_1)
-map.addLayer(anyLayer1_2)
-map.addLayer(anyLayer2_1)
-map.addLayer(anyLayer2_2)
-map.addLayer(anyLayer3_1)
-map.addLayer(anyLayer3_2)
-// some layers...
+// maplibre layer-object
+map.addLayer(layers[0])
+map.addLayer(layers[1])
+map.addLayer(layers[2])
+// ...
 
 import TemporalControl from 'maplibre-gl-temporal-control';
 
 const temporalFrames = [
     {
         title:'frame1', // shown on control panel
-        layers:[anyLayer1_1, anyLayer1_2] // set layers you want to show at one frame...
-    },
-        title:'frame2',
-        layers:[anyLayer2_1, anyLayer2_2]
+        layers:[layers[0]] // set layers you want to show at one frame...
     },
     {
-        title:'frame3',
-        layers:[anyLayer3_1, anyLayer3_2]
+        title:'frame2',
+        layers:[layers[1], layers[2]]
     },
-    // add frames...
+    // ...
 ]
 
 const temporalControl = new TemporalControl(temporalFrames, {
-    interval: 100, // duration a frame is shown, in miliseconds
     position: 'top-left',
-    performance: true // set when rendering is too slow, but frames which are not current are shown mostly transparent
-    showButtons: true // show buttons to change frames
+    interval: 100, // duration a frame is shown, in miliseconds
+    loopDelay: 1000, // delay before looping, in miliseconds
+    showButtons: true, // show/hide buttons in control
+    loop: false, // whether to loop the animation by default
+    autoplay: false, // whether to start playing the animation by default
+    // increase rendering performance by pre-loading all layers by using a low opacity instead of hiding non-visible layers)
+    performance: true,
 });
 map.addControl(temporalControl);
 ```

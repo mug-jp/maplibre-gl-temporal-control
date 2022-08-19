@@ -1,14 +1,17 @@
-import {LayerSpecification, IControl, Map, ControlPosition} from 'maplibre-gl';
+import {ControlPosition, IControl, LayerSpecification, Map} from 'maplibre-gl';
 
-import {play, pause, reload, skipBackward, skipForward} from './icons';
+import {pause, play, reload, skipBackward, skipForward} from './icons';
 
 const ACTIVE_BUTTON_COLOR = 'rgb(204, 204, 204)';
 
 type ContainerOptions = {
   length: number;
   interval: number;
+  loopDelay: number;
   showButtons?: boolean;
   onSliderValueChange: () => void;
+  loop?: boolean;
+  autoplay?: boolean;
 };
 
 const makeImg = (icon: string): HTMLImageElement => {
@@ -22,7 +25,13 @@ const makeContainer = ({
                          interval,
                          showButtons,
                          onSliderValueChange,
+                         loop,
+                         loopDelay,
+                         autoplay
                        }: ContainerOptions): [HTMLDivElement, HTMLDivElement, HTMLInputElement] => {
+  let looping = loop || false;
+  let playing = autoplay || false;
+  let playingTimer: any = null;
   // outest div
   const container = document.createElement('div');
   container.classList.add('mapboxgl-ctrl');
@@ -49,6 +58,34 @@ const makeContainer = ({
   slider.style.width = '80%';
   slider.style.margin = '4px 0';
   container.appendChild(slider);
+
+  const decrement = () => {
+    slider.value = String(Math.max(0, Number(slider.value) - 1));
+    onSliderValueChange();
+    return Number(slider.min) < Number(slider.value);
+  };
+  const increment = () => {
+    if (looping && Number(slider.value) == Number(slider.max)
+    ) {
+      // delay the loop
+      if (playingTimer) {
+        clearInterval(playingTimer);
+      }
+      setTimeout(() => {
+        slider.value = String(Number(slider.min));
+        onSliderValueChange();
+        playingTimer = setInterval(() => {
+          increment();
+        }, interval);
+      }, loopDelay)
+    } else {
+      slider.value = String(Math.min(Number(slider.max), Number(slider.value) + 1));
+      onSliderValueChange();
+    }
+
+    return Number(slider.value) < Number(slider.max);
+  };
+
   if (showButtons) {
     // buttons div
     // loop, prev, pause, play, next
@@ -62,31 +99,13 @@ const makeContainer = ({
     loopButton.style.borderRadius = '0';
     loopButton.style.marginRight = '16px';
     loopButton.style.height = '24px';
+    loopButton.style.backgroundColor = looping ? ACTIVE_BUTTON_COLOR : '';
     loopButton.onclick = () => {
-      loopButton.style.backgroundColor =
-        loopButton.style.backgroundColor === '' ? ACTIVE_BUTTON_COLOR : '';
+      looping = !looping;
+      loopButton.style.backgroundColor = looping ? ACTIVE_BUTTON_COLOR : '';
     };
     buttonsDiv.appendChild(loopButton);
-    const decrement = () => {
-      slider.value = String(Math.max(0, Number(slider.value) - 1));
-      onSliderValueChange();
-      return Number(slider.min) < Number(slider.value);
-    };
-    const increment = () => {
-      if (
-        loopButton.style.backgroundColor !== '' &&
-        Number(slider.value) == Number(slider.max)
-      ) {
-        while (decrement()) {
-        }
-      } else {
-        slider.value = String(
-          Math.min(Number(slider.max), Number(slider.value) + 1),
-        );
-      }
-      onSliderValueChange();
-      return Number(slider.value) < Number(slider.max);
-    };
+
     const prevButton = document.createElement('button');
     prevButton.appendChild(makeImg(skipBackward));
     prevButton.onclick = decrement;
@@ -97,22 +116,29 @@ const makeContainer = ({
     pauseButton.style.border = '0';
     pauseButton.style.height = '24px';
     const playButton = document.createElement('button');
+
     playButton.appendChild(makeImg(play));
+    playButton.style.backgroundColor = playing ? ACTIVE_BUTTON_COLOR : '';
+
     playButton.style.border = '0';
     playButton.style.height = '24px';
     playButton.onclick = () => {
-      if (playButton.style.backgroundColor === ACTIVE_BUTTON_COLOR) return;
-
+      if (playing) return;
+      playing = true;
       playButton.style.backgroundColor = ACTIVE_BUTTON_COLOR;
-      const timerId = setInterval(() => {
+      playingTimer = setInterval(() => {
         increment();
       }, interval);
-      pauseButton.onclick = () => {
-        clearInterval(timerId);
-        pauseButton.onclick = null;
-        playButton.style.backgroundColor = '';
-      };
     };
+
+    pauseButton.onclick = () => {
+      playing = false;
+      if (playingTimer != null) {
+        clearInterval(playingTimer);
+        playButton.style.backgroundColor = '';
+      }
+    };
+
     const nextButton = document.createElement('button');
     nextButton.appendChild(makeImg(skipForward));
     nextButton.style.border = '0';
@@ -125,6 +151,13 @@ const makeContainer = ({
 
     container.appendChild(buttonsDiv);
   }
+  // autoplay
+  if (playing) {
+    playingTimer = setInterval(() => {
+      increment();
+    }, interval);
+  }
+
   return [container, titleDiv, slider];
 };
 
@@ -137,8 +170,11 @@ type TemporalFrame = {
 type Options = {
   position?: ControlPosition;
   interval?: number;
+  loopDelay?: number;
   performance?: boolean;
   showButtons?: boolean;
+  loop?: boolean;
+  autoplay?: boolean;
 };
 
 export default class TemporalControl implements IControl {
@@ -157,7 +193,10 @@ export default class TemporalControl implements IControl {
     const containerOptions: ContainerOptions = {
       length: this.temporalFrames.length,
       interval: this.options.interval || 500,
+      loopDelay: this.options.loopDelay || 1000,
       showButtons: this.options.showButtons || false,
+      loop: this.options.loop || false,
+      autoplay: this.options.autoplay || false,
       onSliderValueChange: () => this.refresh(),
     };
 
@@ -186,22 +225,20 @@ export default class TemporalControl implements IControl {
   }
 
   refresh() {
-    if (this.map?.style && this.map.style?._loaded) {
-      const sliderValue = Number(this.temporalSlider.value);
-      this.containerTitle.innerHTML = this.temporalFrames[sliderValue].title;
-      const visibleLayerIds = this.temporalFrames[sliderValue].layers.map(
-        (layer) => layer.id,
+    const sliderValue = Number(this.temporalSlider.value);
+    this.containerTitle.innerHTML = this.temporalFrames[sliderValue].title;
+    const visibleLayerIds = this.temporalFrames[sliderValue].layers.map(
+      (layer) => layer.id,
+    );
+    this.temporalFrames.forEach((temporalFrame) => {
+      temporalFrame.layers.forEach((layer) =>
+        this.setVisible(layer, visibleLayerIds.includes(layer.id)),
       );
-      this.temporalFrames.forEach((temporalFrame) => {
-        temporalFrame.layers.forEach((layer) =>
-          this.setVisible(layer, visibleLayerIds.includes(layer.id)),
-        );
-      });
-    }
+    });
   }
 
   private setVisible(layer: LayerSpecification, isVisible = true) {
-    if (this.map?.getLayer(layer.id)) {
+    if (this.map?.style && this.map.style?._loaded && this.map?.getLayer(layer.id)) {
       if (
         layer.type === 'raster' ||
         layer.type === 'fill' ||

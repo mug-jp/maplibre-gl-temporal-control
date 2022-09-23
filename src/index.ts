@@ -12,6 +12,7 @@ type ContainerOptions = {
   onSliderValueChange: () => void;
   loop?: boolean;
   autoplay?: boolean;
+  initialValue?: string;
 };
 
 const makeImg = (icon: string): HTMLImageElement => {
@@ -27,7 +28,8 @@ const makeContainer = ({
                          onSliderValueChange,
                          loop,
                          loopDelay,
-                         autoplay
+                         autoplay,
+                         initialValue,
                        }: ContainerOptions): [HTMLDivElement, HTMLDivElement, HTMLInputElement] => {
   let looping = loop || false;
   let playing = autoplay || false;
@@ -42,7 +44,7 @@ const makeContainer = ({
   container.style.textAlign = 'center';
 
   const titleDiv = document.createElement('div');
-  titleDiv.innerHTML = '<br />';
+  titleDiv.innerHTML = initialValue || '<br />';
   titleDiv.style.marginTop = '4px';
   container.appendChild(titleDiv);
 
@@ -198,6 +200,7 @@ export default class TemporalControl implements IControl {
       loop: this.options.loop || false,
       autoplay: this.options.autoplay || false,
       onSliderValueChange: () => this.refresh(),
+      initialValue: this.temporalFrames[0].title,
     };
 
     [this.container, this.containerTitle, this.temporalSlider] =
@@ -205,6 +208,7 @@ export default class TemporalControl implements IControl {
   }
 
   onAdd(map: Map) {
+    console.log('TemporalControl.onAdd');
     this.map = map;
     map.getContainer().appendChild(this.container);
 
@@ -225,6 +229,7 @@ export default class TemporalControl implements IControl {
   }
 
   refresh() {
+
     const sliderValue = Number(this.temporalSlider.value);
     this.containerTitle.innerHTML = this.temporalFrames[sliderValue].title;
     const visibleLayerIds = this.temporalFrames[sliderValue].layers.map(

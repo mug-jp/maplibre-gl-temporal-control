@@ -8,7 +8,7 @@ var makeImg = function (icon) {
     return img;
 };
 var makeContainer = function (_a) {
-    var length = _a.length, interval = _a.interval, showButtons = _a.showButtons, onSliderValueChange = _a.onSliderValueChange, loop = _a.loop, loopDelay = _a.loopDelay, autoplay = _a.autoplay;
+    var length = _a.length, interval = _a.interval, showButtons = _a.showButtons, onSliderValueChange = _a.onSliderValueChange, loop = _a.loop, loopDelay = _a.loopDelay, autoplay = _a.autoplay, initialValue = _a.initialValue;
     var looping = loop || false;
     var playing = autoplay || false;
     var playingTimer = null;
@@ -21,7 +21,7 @@ var makeContainer = function (_a) {
     container.style.backgroundColor = '#fff';
     container.style.textAlign = 'center';
     var titleDiv = document.createElement('div');
-    titleDiv.innerHTML = '<br />';
+    titleDiv.innerHTML = initialValue || '<br />';
     titleDiv.style.marginTop = '4px';
     container.appendChild(titleDiv);
     // temporal slider
@@ -144,11 +144,13 @@ var TemporalControl = /** @class */ (function () {
             loop: this.options.loop || false,
             autoplay: this.options.autoplay || false,
             onSliderValueChange: function () { return _this.refresh(); },
+            initialValue: this.temporalFrames[0].title,
         };
         _a = makeContainer(containerOptions), this.container = _a[0], this.containerTitle = _a[1], this.temporalSlider = _a[2];
     }
     TemporalControl.prototype.onAdd = function (map) {
         var _this = this;
+        console.log('TemporalControl.onAdd');
         this.map = map;
         map.getContainer().appendChild(this.container);
         this.map.on('styledata', function () {

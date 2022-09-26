@@ -208,7 +208,6 @@ export default class TemporalControl implements IControl {
   }
 
   onAdd(map: Map) {
-    console.log('TemporalControl.onAdd');
     this.map = map;
     map.getContainer().appendChild(this.container);
 

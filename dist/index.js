@@ -150,7 +150,6 @@ var TemporalControl = /** @class */ (function () {
     }
     TemporalControl.prototype.onAdd = function (map) {
         var _this = this;
-        console.log('TemporalControl.onAdd');
         this.map = map;
         map.getContainer().appendChild(this.container);
         this.map.on('styledata', function () {

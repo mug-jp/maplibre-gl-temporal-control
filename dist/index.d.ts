@@ -11,10 +11,12 @@ declare type Options = {
     showButtons?: boolean;
     loop?: boolean;
     autoplay?: boolean;
+    opacity?: number;
 };
 export default class TemporalControl implements IControl {
     private map;
     private options;
+    private opacity;
     private container;
     private containerTitle;
     private temporalSlider;
@@ -25,5 +27,6 @@ export default class TemporalControl implements IControl {
     getDefaultPosition(): ControlPosition;
     refresh(): void;
     private setVisible;
+    setOpacity(opacity: number): void;
 }
 export {};

@@ -136,6 +136,7 @@ var TemporalControl = /** @class */ (function () {
         var _this = this;
         this.temporalFrames = temporalFrames;
         this.options = options;
+        this.opacity = options.opacity || 1;
         var containerOptions = {
             length: this.temporalFrames.length,
             interval: this.options.interval || 500,
@@ -194,7 +195,7 @@ var TemporalControl = /** @class */ (function () {
                 var opacity = void 0;
                 if (isVisible) {
                     // @ts-ignore
-                    opacity = ((_e = layer.paint) === null || _e === void 0 ? void 0 : _e["".concat(layer.type, "-opacity")]) || 1;
+                    opacity = ((_e = layer.paint) === null || _e === void 0 ? void 0 : _e["".concat(layer.type, "-opacity")]) || this.opacity;
                 }
                 else {
                     opacity = this.options.performance
@@ -207,6 +208,10 @@ var TemporalControl = /** @class */ (function () {
                 (_g = this.map) === null || _g === void 0 ? void 0 : _g.setLayoutProperty(layer.id, 'visibility', isVisible ? 'visible' : 'none');
             }
         }
+    };
+    TemporalControl.prototype.setOpacity = function (opacity) {
+        this.opacity = opacity;
+        this.refresh();
     };
     return TemporalControl;
 }());

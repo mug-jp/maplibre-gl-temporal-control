@@ -177,12 +177,13 @@ type Options = {
   showButtons?: boolean;
   loop?: boolean;
   autoplay?: boolean;
+  opacity?: number;
 };
 
 export default class TemporalControl implements IControl {
   private map: Map | undefined;
   private options: Options;
-
+  private opacity: number;
   private container: HTMLDivElement;
   private containerTitle!: HTMLDivElement;
   private temporalSlider!: HTMLInputElement;
@@ -191,7 +192,7 @@ export default class TemporalControl implements IControl {
   constructor(temporalFrames: TemporalFrame[], options: Options = {}) {
     this.temporalFrames = temporalFrames;
     this.options = options;
-
+    this.opacity = options.opacity || 1;
     const containerOptions: ContainerOptions = {
       length: this.temporalFrames.length,
       interval: this.options.interval || 500,
@@ -228,7 +229,6 @@ export default class TemporalControl implements IControl {
   }
 
   refresh() {
-
     const sliderValue = Number(this.temporalSlider.value);
     this.containerTitle.innerHTML = this.temporalFrames[sliderValue].title;
     const visibleLayerIds = this.temporalFrames[sliderValue].layers.map(
@@ -263,7 +263,7 @@ export default class TemporalControl implements IControl {
         let opacity;
         if (isVisible) {
           // @ts-ignore
-          opacity = layer.paint?.[`${layer.type}-opacity`] || 1;
+          opacity = layer.paint?.[`${layer.type}-opacity`] || this.opacity;
         } else {
           opacity = this.options.performance
             ? 0.000000000000000000001
@@ -283,5 +283,10 @@ export default class TemporalControl implements IControl {
         );
       }
     }
+  }
+
+  setOpacity(opacity: number) {
+    this.opacity = opacity;
+    this.refresh();
   }
 }

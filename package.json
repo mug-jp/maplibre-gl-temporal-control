@@ -42,6 +42,7 @@
         "webpack-dev-server": "^3.11.2"
     },
     "dependencies": {
+        "maplibre-gl-temporal-control": "github:jcary741/maplibre-gl-temporal-control",
         "ts-node": "^10.9.1"
     }
 }

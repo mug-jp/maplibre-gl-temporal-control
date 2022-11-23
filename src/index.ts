@@ -12,7 +12,8 @@ type ContainerOptions = {
   onSliderValueChange: () => void;
   loop?: boolean;
   autoplay?: boolean;
-  initialValue?: string;
+  initialFrameIndex?: number;
+  initialTitle?: string;
 };
 
 const makeImg = (icon: string): HTMLImageElement => {
@@ -29,7 +30,8 @@ const makeContainer = ({
                          loop,
                          loopDelay,
                          autoplay,
-                         initialValue,
+                         initialFrameIndex,
+                         initialTitle,
                        }: ContainerOptions): [HTMLDivElement, HTMLDivElement, HTMLInputElement] => {
   let looping = loop || false;
   let playing = autoplay || false;
@@ -44,14 +46,14 @@ const makeContainer = ({
   container.style.textAlign = 'center';
 
   const titleDiv = document.createElement('div');
-  titleDiv.innerHTML = initialValue || '<br />';
+  titleDiv.innerHTML = initialTitle || '<br />';
   titleDiv.style.marginTop = '4px';
   container.appendChild(titleDiv);
 
   // temporal slider
   const slider = document.createElement('input');
   slider.type = 'range';
-  slider.value = '0';
+  slider.value = initialFrameIndex ? initialFrameIndex.toString() : '0';
   slider.min = '0';
   slider.max = String(length - 1);
   slider.addEventListener('input', () => {
@@ -178,6 +180,8 @@ type Options = {
   loop?: boolean;
   autoplay?: boolean;
   opacity?: number;
+  initialFrameIndex?: number;
+  onUpdate?: (frameIndex: number) => void;
 };
 
 export default class TemporalControl implements IControl {
@@ -188,11 +192,15 @@ export default class TemporalControl implements IControl {
   private containerTitle!: HTMLDivElement;
   private temporalSlider!: HTMLInputElement;
   private temporalFrames: TemporalFrame[];
+  private onUpdate: (frameIndex: number) => void;
+  private onUpdateSetTimeout: any;
 
   constructor(temporalFrames: TemporalFrame[], options: Options = {}) {
     this.temporalFrames = temporalFrames;
     this.options = options;
     this.opacity = options.opacity || 1;
+    this.onUpdate = options.onUpdate || (() => {
+    });
     const containerOptions: ContainerOptions = {
       length: this.temporalFrames.length,
       interval: this.options.interval || 500,
@@ -201,7 +209,8 @@ export default class TemporalControl implements IControl {
       loop: this.options.loop || false,
       autoplay: this.options.autoplay || false,
       onSliderValueChange: () => this.refresh(),
-      initialValue: this.temporalFrames[0].title,
+      initialFrameIndex: options.initialFrameIndex || 0,
+      initialTitle: this.temporalFrames[options.initialFrameIndex || 0].title,
     };
 
     [this.container, this.containerTitle, this.temporalSlider] =
@@ -239,6 +248,13 @@ export default class TemporalControl implements IControl {
         this.setVisible(layer, visibleLayerIds.includes(layer.id)),
       );
     });
+    if (this.onUpdateSetTimeout) {
+      clearTimeout(this.onUpdateSetTimeout);
+    }
+    // debounce the onUpdate callback
+    this.onUpdateSetTimeout = setTimeout(() => {
+    this.onUpdate(sliderValue);
+    }, 1300);
   }
 
   private setVisible(layer: LayerSpecification, isVisible = true) {
@@ -287,6 +303,11 @@ export default class TemporalControl implements IControl {
 
   setOpacity(opacity: number) {
     this.opacity = opacity;
+    this.refresh();
+  }
+
+  setFrameIndex(frameIndex: number) {
+    this.temporalSlider.value = frameIndex.toString();
     this.refresh();
   }
 }

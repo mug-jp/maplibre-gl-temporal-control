@@ -8,7 +8,7 @@ var makeImg = function (icon) {
     return img;
 };
 var makeContainer = function (_a) {
-    var length = _a.length, interval = _a.interval, showButtons = _a.showButtons, onSliderValueChange = _a.onSliderValueChange, loop = _a.loop, loopDelay = _a.loopDelay, autoplay = _a.autoplay, initialValue = _a.initialValue;
+    var length = _a.length, interval = _a.interval, showButtons = _a.showButtons, onSliderValueChange = _a.onSliderValueChange, loop = _a.loop, loopDelay = _a.loopDelay, autoplay = _a.autoplay, initialFrameIndex = _a.initialFrameIndex, initialTitle = _a.initialTitle;
     var looping = loop || false;
     var playing = autoplay || false;
     var playingTimer = null;
@@ -21,13 +21,13 @@ var makeContainer = function (_a) {
     container.style.backgroundColor = '#fff';
     container.style.textAlign = 'center';
     var titleDiv = document.createElement('div');
-    titleDiv.innerHTML = initialValue || '<br />';
+    titleDiv.innerHTML = initialTitle || '<br />';
     titleDiv.style.marginTop = '4px';
     container.appendChild(titleDiv);
     // temporal slider
     var slider = document.createElement('input');
     slider.type = 'range';
-    slider.value = '0';
+    slider.value = initialFrameIndex ? initialFrameIndex.toString() : '0';
     slider.min = '0';
     slider.max = String(length - 1);
     slider.addEventListener('input', function () {
@@ -137,6 +137,8 @@ var TemporalControl = /** @class */ (function () {
         this.temporalFrames = temporalFrames;
         this.options = options;
         this.opacity = options.opacity || 1;
+        this.onUpdate = options.onUpdate || (function () {
+        });
         var containerOptions = {
             length: this.temporalFrames.length,
             interval: this.options.interval || 500,
@@ -145,7 +147,8 @@ var TemporalControl = /** @class */ (function () {
             loop: this.options.loop || false,
             autoplay: this.options.autoplay || false,
             onSliderValueChange: function () { return _this.refresh(); },
-            initialValue: this.temporalFrames[0].title,
+            initialFrameIndex: options.initialFrameIndex || 0,
+            initialTitle: this.temporalFrames[options.initialFrameIndex || 0].title,
         };
         _a = makeContainer(containerOptions), this.container = _a[0], this.containerTitle = _a[1], this.temporalSlider = _a[2];
     }
@@ -176,6 +179,13 @@ var TemporalControl = /** @class */ (function () {
                 return _this.setVisible(layer, visibleLayerIds.includes(layer.id));
             });
         });
+        if (this.onUpdateSetTimeout) {
+            clearTimeout(this.onUpdateSetTimeout);
+        }
+        // debounce the onUpdate callback
+        this.onUpdateSetTimeout = setTimeout(function () {
+            _this.onUpdate(sliderValue);
+        }, 1300);
     };
     TemporalControl.prototype.setVisible = function (layer, isVisible) {
         var _a, _b, _c, _d, _e, _f, _g;
@@ -211,6 +221,10 @@ var TemporalControl = /** @class */ (function () {
     };
     TemporalControl.prototype.setOpacity = function (opacity) {
         this.opacity = opacity;
+        this.refresh();
+    };
+    TemporalControl.prototype.setFrameIndex = function (frameIndex) {
+        this.temporalSlider.value = frameIndex.toString();
         this.refresh();
     };
     return TemporalControl;

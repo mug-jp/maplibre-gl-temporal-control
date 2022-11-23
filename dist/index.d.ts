@@ -12,6 +12,8 @@ declare type Options = {
     loop?: boolean;
     autoplay?: boolean;
     opacity?: number;
+    initialFrameIndex?: number;
+    onUpdate?: (frameIndex: number) => void;
 };
 export default class TemporalControl implements IControl {
     private map;
@@ -21,6 +23,8 @@ export default class TemporalControl implements IControl {
     private containerTitle;
     private temporalSlider;
     private temporalFrames;
+    private onUpdate;
+    private onUpdateSetTimeout;
     constructor(temporalFrames: TemporalFrame[], options?: Options);
     onAdd(map: Map): HTMLDivElement;
     onRemove(): void;
@@ -28,5 +32,6 @@ export default class TemporalControl implements IControl {
     refresh(): void;
     private setVisible;
     setOpacity(opacity: number): void;
+    setFrameIndex(frameIndex: number): void;
 }
 export {};

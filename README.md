@@ -68,8 +68,19 @@ const temporalControl = new TemporalControl(temporalFrames, {
     autoplay: false, // whether to start playing the animation by default
     // increase rendering performance by pre-loading all layers by using a low opacity instead of hiding non-visible layers)
     performance: true,
+    opacity: 1, // opacity of layers.
+    initialFrameIndex: 0, // initial frame index
+    onUpdate: (frameIndex) => {
+        // callback when frame is changed
+    }
 });
 map.addControl(temporalControl);
+
+// optionally change frame from outside of the control
+temporalControl.setFrame(1);
+// optionally set the opacity of the layers from outside of the control
+temporalControl.setOpacity(0.5);
+
 ```
 
 ### Tips
@@ -77,4 +88,4 @@ map.addControl(temporalControl);
 -   In frames, You must set layer-objects corresponding to in map.
 -   Layers set in frames must be added in map
 -   when `performance: true`, not-current frames are shown as opacity=0.000000000000000000001
-    -   this option may not be neccesary for ordinary usecases
+    -   this option may not be necessary for ordinary usecases

@@ -14,6 +14,7 @@ type ContainerOptions = {
   autoplay?: boolean;
   initialFrameIndex?: number;
   initialTitle?: string;
+  containerClass?: string;
 };
 
 const makeImg = (icon: string): HTMLImageElement => {
@@ -32,6 +33,7 @@ const makeContainer = ({
                          autoplay,
                          initialFrameIndex,
                          initialTitle,
+                         containerClass
                        }: ContainerOptions): [HTMLDivElement, HTMLDivElement, HTMLInputElement] => {
   let looping = loop || false;
   let playing = autoplay || false;
@@ -40,6 +42,9 @@ const makeContainer = ({
   const container = document.createElement('div');
   container.classList.add('mapboxgl-ctrl');
   container.classList.add('mapboxgl-ctrl-group');
+  if (containerClass) {
+    container.classList.add(containerClass);
+  }
   container.style.width = '240px';
   container.style.height = showButtons ? '84px' : '56px';
   container.style.backgroundColor = '#fff';
@@ -181,7 +186,7 @@ type Options = {
   autoplay?: boolean;
   opacity?: number;
   initialFrameIndex?: number;
-  onUpdate?: (frameIndex: number) => void;
+  containerClass;
 };
 
 export default class TemporalControl implements IControl {
@@ -192,15 +197,11 @@ export default class TemporalControl implements IControl {
   private containerTitle!: HTMLDivElement;
   private temporalSlider!: HTMLInputElement;
   private temporalFrames: TemporalFrame[];
-  private onUpdate: (frameIndex: number) => void;
-  private onUpdateSetTimeout: any;
 
   constructor(temporalFrames: TemporalFrame[], options: Options = {}) {
     this.temporalFrames = temporalFrames;
     this.options = options;
     this.opacity = options.opacity || 1;
-    this.onUpdate = options.onUpdate || (() => {
-    });
     const containerOptions: ContainerOptions = {
       length: this.temporalFrames.length,
       interval: this.options.interval || 500,
@@ -211,6 +212,7 @@ export default class TemporalControl implements IControl {
       onSliderValueChange: () => this.refresh(),
       initialFrameIndex: options.initialFrameIndex || 0,
       initialTitle: this.temporalFrames[options.initialFrameIndex || 0].title,
+      containerClass: options.containerClass || '',
     };
 
     [this.container, this.containerTitle, this.temporalSlider] =
@@ -248,13 +250,6 @@ export default class TemporalControl implements IControl {
         this.setVisible(layer, visibleLayerIds.includes(layer.id)),
       );
     });
-    if (this.onUpdateSetTimeout) {
-      clearTimeout(this.onUpdateSetTimeout);
-    }
-    // debounce the onUpdate callback
-    this.onUpdateSetTimeout = setTimeout(() => {
-    this.onUpdate(sliderValue);
-    }, 1300);
   }
 
   private setVisible(layer: LayerSpecification, isVisible = true) {

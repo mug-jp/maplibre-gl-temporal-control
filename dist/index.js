@@ -8,7 +8,7 @@ var makeImg = function (icon) {
     return img;
 };
 var makeContainer = function (_a) {
-    var length = _a.length, interval = _a.interval, showButtons = _a.showButtons, onSliderValueChange = _a.onSliderValueChange, loop = _a.loop, loopDelay = _a.loopDelay, autoplay = _a.autoplay, initialFrameIndex = _a.initialFrameIndex, initialTitle = _a.initialTitle;
+    var length = _a.length, interval = _a.interval, showButtons = _a.showButtons, onSliderValueChange = _a.onSliderValueChange, loop = _a.loop, loopDelay = _a.loopDelay, autoplay = _a.autoplay, initialFrameIndex = _a.initialFrameIndex, initialTitle = _a.initialTitle, containerClass = _a.containerClass;
     var looping = loop || false;
     var playing = autoplay || false;
     var playingTimer = null;
@@ -16,6 +16,9 @@ var makeContainer = function (_a) {
     var container = document.createElement('div');
     container.classList.add('mapboxgl-ctrl');
     container.classList.add('mapboxgl-ctrl-group');
+    if (containerClass) {
+        container.classList.add(containerClass);
+    }
     container.style.width = '240px';
     container.style.height = showButtons ? '84px' : '56px';
     container.style.backgroundColor = '#fff';
@@ -137,8 +140,6 @@ var TemporalControl = /** @class */ (function () {
         this.temporalFrames = temporalFrames;
         this.options = options;
         this.opacity = options.opacity || 1;
-        this.onUpdate = options.onUpdate || (function () {
-        });
         var containerOptions = {
             length: this.temporalFrames.length,
             interval: this.options.interval || 500,
@@ -149,6 +150,7 @@ var TemporalControl = /** @class */ (function () {
             onSliderValueChange: function () { return _this.refresh(); },
             initialFrameIndex: options.initialFrameIndex || 0,
             initialTitle: this.temporalFrames[options.initialFrameIndex || 0].title,
+            containerClass: options.containerClass || '',
         };
         _a = makeContainer(containerOptions), this.container = _a[0], this.containerTitle = _a[1], this.temporalSlider = _a[2];
     }
@@ -179,13 +181,6 @@ var TemporalControl = /** @class */ (function () {
                 return _this.setVisible(layer, visibleLayerIds.includes(layer.id));
             });
         });
-        if (this.onUpdateSetTimeout) {
-            clearTimeout(this.onUpdateSetTimeout);
-        }
-        // debounce the onUpdate callback
-        this.onUpdateSetTimeout = setTimeout(function () {
-            _this.onUpdate(sliderValue);
-        }, 1300);
     };
     TemporalControl.prototype.setVisible = function (layer, isVisible) {
         var _a, _b, _c, _d, _e, _f, _g;

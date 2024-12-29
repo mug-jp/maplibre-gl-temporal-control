@@ -18,6 +18,8 @@ type ContainerOptions = {
 const makeImg = (svg: string): HTMLImageElement => {
 	const img = document.createElement('img');
 	img.src = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+	img.style.width = '24px';
+	img.style.height = '24px';
 	return img;
 };
 
@@ -59,12 +61,15 @@ const makeContainer = ({
 	buttonsDiv.style.display = 'flex';
 	buttonsDiv.style.justifyContent = 'center';
 	buttonsDiv.style.margin = '4px 0 0 0';
+
+	// loop button
 	const loopButton = document.createElement('button');
 	loopButton.appendChild(makeImg(reload));
 	loopButton.style.border = '0';
 	loopButton.style.borderRadius = '0';
 	loopButton.style.marginRight = '16px';
 	loopButton.style.height = '24px';
+	loopButton.style.borderRadius = '4px';
 	loopButton.onclick = () => {
 		loopButton.style.backgroundColor =
 			loopButton.style.backgroundColor === '' ? ACTIVE_BUTTON_COLOR : '';
@@ -89,19 +94,28 @@ const makeContainer = ({
 		onSliderValueChange();
 		return Number(slider.value) < Number(slider.max);
 	};
+
+	// prev button
 	const prevButton = document.createElement('button');
 	prevButton.appendChild(makeImg(skipBackward));
 	prevButton.onclick = decrement;
 	prevButton.style.border = '0';
 	prevButton.style.height = '24px';
+	prevButton.style.borderRadius = '4px';
+
+	// pause button
 	const pauseButton = document.createElement('button');
 	pauseButton.appendChild(makeImg(pause));
 	pauseButton.style.border = '0';
 	pauseButton.style.height = '24px';
+	pauseButton.style.borderRadius = '4px';
+
+	// play button
 	const playButton = document.createElement('button');
 	playButton.appendChild(makeImg(play));
 	playButton.style.border = '0';
 	playButton.style.height = '24px';
+	playButton.style.borderRadius = '4px';
 	playButton.onclick = () => {
 		if (playButton.style.backgroundColor === ACTIVE_BUTTON_COLOR) return;
 
@@ -115,11 +129,15 @@ const makeContainer = ({
 			playButton.style.backgroundColor = '';
 		};
 	};
+
+	// next button
 	const nextButton = document.createElement('button');
 	nextButton.appendChild(makeImg(skipForward));
 	nextButton.style.border = '0';
 	nextButton.style.height = '24px';
+	nextButton.style.borderRadius = '4px';
 	nextButton.onclick = increment;
+
 	buttonsDiv.appendChild(prevButton);
 	buttonsDiv.appendChild(pauseButton);
 	buttonsDiv.appendChild(playButton);

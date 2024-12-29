@@ -33,6 +33,7 @@ const temporalFrames = [
         title:'frame1', // shown on control panel
         layers:[anyLayer1_1, anyLayer1_2] // set layers you want to show at one frame...
     },
+    {
         title:'frame2',
         layers:[anyLayer2_1, anyLayer2_2]
     },
@@ -46,7 +47,7 @@ const temporalFrames = [
 const temporalControl = new TemporalControl(temporalFrames, {
     interval: 100, // duration a frame is shown, in miliseconds
     position: 'top-left',
-    performance: true // set when rendering is too slow, but frames which are not current are shown mostly transparent
+    performance: true // set when rendering is too slow
 });
 map.addControl(temporalControl);
 
@@ -55,12 +56,15 @@ temporalControl.prev()
 temporalControl.next()
 temporalControl.play()
 temporalControl.pause()
+temporalControl.isPlaying()
+temporalControl.isLoopEnabled()
 temporalControl.setLoopEnabled(true)
+temporalControl.goto(5)
 ```
 
 ### Tips
 
-- In frames, You must set layer-objects corresponding to in map.
-- Layers set in frames must be added in map
+- Layers set in frames must be added in the map
+- In each frames, You have to set layer-objects corresponding to the layers added to the map.
 - when `performance: true`, not-current frames are shown as opacity=0.000000000000000000001
   - this option may not be neccesary for ordinary usecases

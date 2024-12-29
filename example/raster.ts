@@ -151,4 +151,9 @@ nowcast.getTimeData().then((timedata) => {
 	btnLoop.addEventListener('click', () => {
 		temporalControl.setLoopEnabled(!temporalControl.isLoopEnabled());
 	});
+
+	const btnGoto = document.getElementById('btn-goto')!;
+	btnGoto.addEventListener('click', () => {
+		temporalControl.goto(6);
+	});
 });

@@ -205,6 +205,7 @@ export default class TemporalControl implements IControl {
 	isPlaying: () => boolean;
 	isLoopEnabled: () => boolean;
 	setLoopEnabled: (enabled: boolean) => void;
+	goto: (index: number) => void;
 
 	constructor(temporalFrames: TemporalFrame[], options: Options = {}) {
 		this.temporalFrames = temporalFrames;
@@ -239,6 +240,12 @@ export default class TemporalControl implements IControl {
 		this.isPlaying = isPlaying;
 		this.isLoopEnabled = isLoopEnabled;
 		this.setLoopEnabled = setLoopEnabled;
+		this.goto = (idx: number) => {
+			slider.value = String(
+				Math.min(this.temporalFrames.length - 1, Math.max(0, idx)),
+			);
+			this.refresh();
+		};
 	}
 
 	onAdd(map: Map) {

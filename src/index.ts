@@ -15,9 +15,9 @@ type ContainerOptions = {
 	onSliderValueChange: () => void;
 };
 
-const makeImg = (icon: string): HTMLImageElement => {
+const makeImg = (svg: string): HTMLImageElement => {
 	const img = document.createElement('img');
-	img.src = icon;
+	img.src = `data:image/svg+xml,${encodeURIComponent(svg)}`;
 	return img;
 };
 

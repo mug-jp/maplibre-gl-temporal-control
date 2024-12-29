@@ -62,6 +62,16 @@ temporalControl.setLoopEnabled(true)
 temporalControl.goto(5)
 ```
 
+### via CDN
+
+```html
+<script type="module">
+    import TemporalControl from 'https://www.unpkg.com/maplibre-gl-temporal-control@1.2.0/build/index.js';
+    const temporalControl = new TemporalControl(temporalFrames);
+    map.addControl(temporalControl);
+</script>
+```
+
 ### Tips
 
 - Layers set in frames must be added in the map

@@ -8,8 +8,8 @@ const makeImg = (icon) => {
 const makeContainer = ({ length, interval, onSliderValueChange, }) => {
     // outest div
     const container = document.createElement('div');
-    container.classList.add('mapboxgl-ctrl');
-    container.classList.add('mapboxgl-ctrl-group');
+    container.classList.add('maplibregl-ctrl');
+    container.classList.add('maplibregl-ctrl-group');
     container.style.width = '240px';
     container.style.height = '84px';
     container.style.backgroundColor = '#fff';
@@ -160,9 +160,7 @@ export default class TemporalControl {
                 opacity = layer.paint?.[`${layer.type}-opacity`] || 1;
             }
             else {
-                opacity = this.options.performance
-                    ? 0.000000000000000000001
-                    : 0;
+                opacity = this.options.performance ? 0.000000000000000000001 : 0;
             }
             this.map?.setPaintProperty(layer.id, `${layer.type}-opacity`, opacity);
         }

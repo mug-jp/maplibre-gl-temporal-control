@@ -1,14 +1,20 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	root: './example',
-	base: './',
 	build: {
-		outDir: '../dist',
+		outDir: 'build',
+		sourcemap: true,
+		lib: {
+			entry: 'src/index.ts',
+			name: 'TemporalControl',
+			fileName: 'index',
+		},
 		rollupOptions: {
-			input: {
-				raster: 'example/raster.html',
-				vector: 'example/vector.html',
+			external: ['maplibre-gl'],
+			output: {
+				globals: {
+					'maplibre-gl': 'maplibregl',
+				},
 			},
 		},
 	},

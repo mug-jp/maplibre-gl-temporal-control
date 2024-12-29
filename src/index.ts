@@ -176,15 +176,13 @@ const makeContainer = ({
 	};
 };
 
-type Position = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-
 type TemporalFrame = {
 	title: string;
 	layers: LayerSpecification[];
 };
 
 type Options = {
-	position?: Position;
+	position?: ControlPosition;
 	interval?: number;
 	performance?: boolean;
 };

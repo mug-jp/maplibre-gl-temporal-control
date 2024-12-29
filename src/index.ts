@@ -5,7 +5,13 @@ import type {
 	ControlPosition,
 } from 'maplibre-gl';
 
-import { play, pause, reload, skipBackward, skipForward } from './icons';
+import {
+	playSvg,
+	pauseSvg,
+	reloadSvg,
+	skipBackwardSvg,
+	skipForwardSvg,
+} from './icons';
 
 const ACTIVE_BUTTON_COLOR = 'rgb(204, 204, 204)';
 
@@ -23,11 +29,13 @@ const makeImg = (svg: string): HTMLImageElement => {
 	return img;
 };
 
+let timerId: number | undefined;
+
 const makeContainer = ({
 	length,
 	interval,
 	onSliderValueChange,
-}: ContainerOptions): [HTMLDivElement, HTMLDivElement, HTMLInputElement] => {
+}: ContainerOptions) => {
 	// outest div
 	const container = document.createElement('div');
 	container.classList.add('maplibregl-ctrl');
@@ -63,18 +71,21 @@ const makeContainer = ({
 	buttonsDiv.style.margin = '4px 0 0 0';
 
 	// loop button
+	const setLoopEnabled = (enabled: boolean) => {
+		loopButton.style.backgroundColor = enabled ? ACTIVE_BUTTON_COLOR : '';
+	};
+	const isLoopEnabled = () =>
+		loopButton.style.backgroundColor === ACTIVE_BUTTON_COLOR;
 	const loopButton = document.createElement('button');
-	loopButton.appendChild(makeImg(reload));
+	loopButton.appendChild(makeImg(reloadSvg));
 	loopButton.style.border = '0';
 	loopButton.style.borderRadius = '0';
 	loopButton.style.marginRight = '16px';
 	loopButton.style.height = '24px';
 	loopButton.style.borderRadius = '4px';
-	loopButton.onclick = () => {
-		loopButton.style.backgroundColor =
-			loopButton.style.backgroundColor === '' ? ACTIVE_BUTTON_COLOR : '';
-	};
+	loopButton.onclick = () => setLoopEnabled(!isLoopEnabled());
 	buttonsDiv.appendChild(loopButton);
+
 	const decrement = () => {
 		slider.value = String(Math.max(0, Number(slider.value) - 1));
 		onSliderValueChange();
@@ -97,42 +108,48 @@ const makeContainer = ({
 
 	// prev button
 	const prevButton = document.createElement('button');
-	prevButton.appendChild(makeImg(skipBackward));
+	prevButton.appendChild(makeImg(skipBackwardSvg));
 	prevButton.onclick = decrement;
 	prevButton.style.border = '0';
 	prevButton.style.height = '24px';
 	prevButton.style.borderRadius = '4px';
 
 	// pause button
+	const pause = () => {
+		if (timerId === undefined) return;
+		clearInterval(timerId);
+		timerId = undefined;
+		pauseButton.onclick = null;
+		playButton.style.backgroundColor = '';
+	};
 	const pauseButton = document.createElement('button');
-	pauseButton.appendChild(makeImg(pause));
+	pauseButton.appendChild(makeImg(pauseSvg));
 	pauseButton.style.border = '0';
 	pauseButton.style.height = '24px';
 	pauseButton.style.borderRadius = '4px';
+	pauseButton.onclick = pause;
 
 	// play button
+	const isPlaying = () =>
+		playButton.style.backgroundColor === ACTIVE_BUTTON_COLOR;
+	const play = () => {
+		if (isPlaying()) return;
+		playButton.style.backgroundColor = ACTIVE_BUTTON_COLOR;
+		timerId = setInterval(() => {
+			increment();
+		}, interval);
+	};
+
 	const playButton = document.createElement('button');
-	playButton.appendChild(makeImg(play));
+	playButton.appendChild(makeImg(playSvg));
 	playButton.style.border = '0';
 	playButton.style.height = '24px';
 	playButton.style.borderRadius = '4px';
-	playButton.onclick = () => {
-		if (playButton.style.backgroundColor === ACTIVE_BUTTON_COLOR) return;
-
-		playButton.style.backgroundColor = ACTIVE_BUTTON_COLOR;
-		const timerId = setInterval(() => {
-			increment();
-		}, interval);
-		pauseButton.onclick = () => {
-			clearInterval(timerId);
-			pauseButton.onclick = null;
-			playButton.style.backgroundColor = '';
-		};
-	};
+	playButton.onclick = play;
 
 	// next button
 	const nextButton = document.createElement('button');
-	nextButton.appendChild(makeImg(skipForward));
+	nextButton.appendChild(makeImg(skipForwardSvg));
 	nextButton.style.border = '0';
 	nextButton.style.height = '24px';
 	nextButton.style.borderRadius = '4px';
@@ -145,7 +162,18 @@ const makeContainer = ({
 
 	container.appendChild(buttonsDiv);
 
-	return [container, titleDiv, slider];
+	return {
+		container,
+		titleDiv,
+		slider,
+		increment,
+		decrement,
+		isPlaying,
+		play,
+		pause,
+		isLoopEnabled,
+		setLoopEnabled,
+	};
 };
 
 type Position = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -170,6 +198,14 @@ export default class TemporalControl implements IControl {
 	private temporalSlider!: HTMLInputElement;
 	private temporalFrames: TemporalFrame[];
 
+	next: () => boolean;
+	prev: () => boolean;
+	play: () => void;
+	pause: () => void;
+	isPlaying: () => boolean;
+	isLoopEnabled: () => boolean;
+	setLoopEnabled: (enabled: boolean) => void;
+
 	constructor(temporalFrames: TemporalFrame[], options: Options = {}) {
 		this.temporalFrames = temporalFrames;
 		this.options = options;
@@ -180,8 +216,29 @@ export default class TemporalControl implements IControl {
 			onSliderValueChange: () => this.refresh(),
 		};
 
-		[this.container, this.containerTitle, this.temporalSlider] =
-			makeContainer(containerOptions);
+		const {
+			container,
+			titleDiv,
+			slider,
+			increment,
+			decrement,
+			play,
+			pause,
+			isPlaying,
+			isLoopEnabled,
+			setLoopEnabled,
+		} = makeContainer(containerOptions);
+
+		this.container = container;
+		this.containerTitle = titleDiv;
+		this.temporalSlider = slider;
+		this.next = increment;
+		this.prev = decrement;
+		this.play = play;
+		this.pause = pause;
+		this.isPlaying = isPlaying;
+		this.isLoopEnabled = isLoopEnabled;
+		this.setLoopEnabled = setLoopEnabled;
 	}
 
 	onAdd(map: Map) {

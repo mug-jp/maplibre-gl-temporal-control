@@ -125,4 +125,30 @@ nowcast.getTimeData().then((timedata) => {
 		interval: 100,
 	});
 	map.addControl(temporalControl);
+
+	// control from outside
+	const btnPrev = document.getElementById('btn-prev')!;
+	btnPrev.addEventListener('click', () => {
+		temporalControl.prev();
+	});
+
+	const btnNext = document.getElementById('btn-next')!;
+	btnNext.addEventListener('click', () => {
+		temporalControl.next();
+	});
+
+	const btnPlay = document.getElementById('btn-play')!;
+	btnPlay.addEventListener('click', () => {
+		temporalControl.play();
+	});
+
+	const btnPause = document.getElementById('btn-pause')!;
+	btnPause.addEventListener('click', () => {
+		temporalControl.pause();
+	});
+
+	const btnLoop = document.getElementById('btn-loop')!;
+	btnLoop.addEventListener('click', () => {
+		temporalControl.setLoopEnabled(!temporalControl.isLoopEnabled());
+	});
 });

@@ -4,8 +4,8 @@
 
 ## examples
 
--   RasterTiles: https://mug-jp.github.io/maplibre-gl-temporal-control/raster.html
--   VectorTiles: https://mug-jp.github.io/maplibre-gl-temporal-control/vector.html
+- RasterTiles: <https://mug-jp.github.io/maplibre-gl-temporal-control/raster.html>
+- VectorTiles: <https://mug-jp.github.io/maplibre-gl-temporal-control/vector.html>
 
 ## usage
 
@@ -49,11 +49,18 @@ const temporalControl = new TemporalControl(temporalFrames, {
     performance: true // set when rendering is too slow, but frames which are not current are shown mostly transparent
 });
 map.addControl(temporalControl);
+
+// you can control programatically
+temporalControl.prev()
+temporalControl.next()
+temporalControl.play()
+temporalControl.pause()
+temporalControl.setLoopEnabled(true)
 ```
 
 ### Tips
 
--   In frames, You must set layer-objects corresponding to in map.
--   Layers set in frames must be added in map
--   when `performance: true`, not-current frames are shown as opacity=0.000000000000000000001
-    -   this option may not be neccesary for ordinary usecases
+- In frames, You must set layer-objects corresponding to in map.
+- Layers set in frames must be added in map
+- when `performance: true`, not-current frames are shown as opacity=0.000000000000000000001
+  - this option may not be neccesary for ordinary usecases

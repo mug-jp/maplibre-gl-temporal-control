@@ -12,14 +12,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Kanahiro/maplibre-gl-temporal-controller.git"
+		"url": "git+https://github.com/mug-jp/maplibre-gl-temporal-controller.git"
 	},
 	"author": "Kanahiro Iguchi <kanahiro.iguchi@gmail.com> (https://github.com/Kanahiro)",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/Kanahiro/maplibre-gl-temporal-controller/issues"
+		"url": "https://github.com/mug-jp/maplibre-gl-temporal-controller/issues"
 	},
-	"homepage": "https://github.com/Kanahiro/maplibre-gl-temporal-controller#readme",
+	"homepage": "https://github.com/mug-jp/maplibre-gl-temporal-controller#readme",
 	"devDependencies": {
 		"@types/node": "^14.18.63",
 		"jma-utils": "^0.1.0",

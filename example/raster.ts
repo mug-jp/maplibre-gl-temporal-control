@@ -86,7 +86,7 @@ const map = new maplibregl.Map({
 	bearing: -18,
 	maxPitch: 85,
 	pitch: 60,
-	zoom: 2,
+	zoom: 8,
 	minZoom: 5,
 	maxZoom: 10,
 });

@@ -12,8 +12,8 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0
       maplibre-gl:
-        specifier: 5.0.0-pre.10
-        version: 5.0.0-pre.10
+        specifier: ^5.0.0
+        version: 5.0.0
       rollup-plugin-visualizer:
         specifier: ^5.13.1
         version: 5.13.1(rollup@4.29.1)
@@ -462,8 +462,8 @@ packages:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
     engines: {node: '>=0.10.0'}
 
-  maplibre-gl@5.0.0-pre.10:
-    resolution: {integrity: sha512-t+RmPTwP77ZOGkV/8UzMtUnk96Cyl/WUbuqWPJzsb7KiK5i7Mf/WzAM1t1r+vbSq22FKJtbZy3H5xu6cOXaOZw==}
+  maplibre-gl@5.0.0:
+    resolution: {integrity: sha512-WG8IYFK2gfJYXvWjlqg1yavo/YO/JlNkblAJMt19sjIafP5oJzTgXFiOLUIYkjtrv5pKiAWuSYsx4CD3ithJqw==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   minimist@1.2.8:
@@ -963,7 +963,7 @@ snapshots:
 
   kind-of@6.0.3: {}
 
-  maplibre-gl@5.0.0-pre.10:
+  maplibre-gl@5.0.0:
     dependencies:
       '@mapbox/geojson-rewind': 0.5.2
       '@mapbox/jsonlint-lines-primitives': 2.0.2

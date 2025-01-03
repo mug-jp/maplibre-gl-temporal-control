@@ -1,3 +1,7 @@
+![GitHub Release](https://badge.fury.io/js/maplibre-gl-temporal-control.svg)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mug-jp/maplibre-gl-temporal-control/test.yml?label=test)
+[![codecov](https://codecov.io/gh/mug-jp/maplibre-gl-temporal-control/graph/badge.svg?token=Jy2oiwr0KV)](https://codecov.io/gh/mug-jp/maplibre-gl-temporal-control)
+
 # maplibre-gl-temporal-control
 
 <img src='./imgs/anime.gif'>

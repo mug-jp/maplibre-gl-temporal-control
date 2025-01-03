@@ -4,7 +4,7 @@
 	"version": "1.2.0",
 	"description": "Temporal Control plugin for Maplibre GL JS",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "vitest src --coverage --coverage.provider=v8",
 		"build": "vite build -c vite.config.example.ts",
 		"build:pkg": "vite build && tsc",
 		"prepare": "npm run build:pkg",
@@ -21,11 +21,15 @@
 	},
 	"homepage": "https://github.com/mug-jp/maplibre-gl-temporal-controller#readme",
 	"devDependencies": {
+		"@vitest/browser": "^2.1.8",
+		"@vitest/coverage-v8": "^2.1.8",
 		"jma-utils": "^0.1.0",
-		"maplibre-gl": "5.0.0-pre.10",
+		"maplibre-gl": "^5.0.0",
+		"playwright": "^1.49.1",
 		"rollup-plugin-visualizer": "^5.13.1",
 		"typescript": "^4.9.5",
-		"vite": "^6.0.6"
+		"vite": "^6.0.6",
+		"vitest": "^2.1.8"
 	},
 	"main": "./build/index.umd.cjs",
 	"module": "./build/index.js",

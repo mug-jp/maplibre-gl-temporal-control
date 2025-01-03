@@ -1,0 +1,41 @@
+name: test
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'src/**'
+      - 'example/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '22.x'
+
+      - name: install pnpm
+        run: npm install -g pnpm
+
+      - name: install
+        run: pnpm install
+
+      - name: build
+        run: pnpm build:pkg
+
+      - name: install playwright
+        run: pnpm exec playwright install
+
+      - name: unittest
+        run: pnpm test
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

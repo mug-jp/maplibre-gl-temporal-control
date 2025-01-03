@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	build: {
@@ -16,6 +16,14 @@ export default defineConfig({
 					'maplibre-gl': 'maplibregl',
 				},
 			},
+		},
+	},
+	test: {
+		browser: {
+			provider: 'playwright', // or 'webdriverio'
+			enabled: true,
+			name: 'chromium', // browser name is required
+			headless: true,
 		},
 	},
 });
